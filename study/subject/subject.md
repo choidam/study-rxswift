@@ -1,17 +1,20 @@
 ## Subject
 
 - `Observable` 이자 `Observer` 인 역할을 합니다.
-- 실시간으로 `Observable` 에 값을 추가하고 `Subscribe` 할 수 있습니다.
-- `Observer` 역할로 하나 이상의 `Observable`을 구독하며, `Observable` 역할로 아이템을 내보낼 수 있습니다.
+- `Observable` 특성 : `subsciribe()` 메소드
+- `Observer` 특성 : `on()` 메소드, 하나 이상의 `Observable` 구독
 
 <br/>
 
 ## 1. PublishSubject
 
-PublishSubject는 `.completed`, `.error` 이벤트가 발생할 때까지 (종료될 때까지) **subscribe한 이후**부터 이벤트를 방출합니다.
+- PublishSubject는 `.completed`, `.error` 이벤트가 발생할 때까지 (종료될 때까지) **subscribe한 이후**부터 이벤트를 방출합니다.
+- 초기값(상태값)이 없기 때문에 구독해도 바로 이벤트를 받을 수는 없습니다.
+- `next` 이벤트가 들어오면, 자신을 구독한 모든 옵저버에게 이벤트를 전달합니다.
+- 종료 이벤트를 받으면, 종료 이벤트를 내보내고 해당 Subject는 종료됩니다. 더이상의 구독을 유지할 이유가 없기 때문에 현재의 구독을 모두 해지합니다.
+- 종료된 PublishSubject를 구독하면, 마지막으로 발생한 종료 이벤트를 받게 됩니다.
 
 <div align="center"><img src="./img/publishSubject01.png" width="350"><img src="./img/publishSubject02.png" width="350"></div>
-
 
 
 ```swift
@@ -51,7 +54,13 @@ subject.onNext(5)
 
 ## 2. BehaviorSubject
 
-`BehaviorSubject`는  **초기값** 을 가집니다. `PublishSubject` 와 달리 항상 **직전의 값부터 구독** 합니다. 
+- `BehaviorSubject`는  **초기값** 을 가집니다. `PublishSubject` 와 달리 항상 **직전의 값부터 구독** 합니다. 
+- 상태값을 `value()` 메소드로 참조 가능합니다.
+- `value()` 메소드는 BehaviorSubject에 error가 발생했거나 dispose된 경우는 에러를 던집니다.
+- 구독을 할 경우, 자신의 현재 상태 값을 첫번째 이벤트로 내보냅니다.
+- `next` 이벤트가 들어오면, 자신의 상태값을 갱신하고 자신을 구독하고 있는 모든 옵저버들에게 이벤트를 내보냅니다.
+- completed나 error 이벤트(이하, 종료 이벤트)가 발생한 경우, 해당 Subject는 종료되고 종료 이벤트가 모든 옵저버에 전달됩니다.
+- 종료된 Subject에 접근할 경우, 해당 subject가 마지막으로 발생시킨 종료 이벤트를 받게 됩니다.(completed면 completed, error면 error)
 
 <div align="center"><img src="./img/BehaviorSubject01.png" width="350"><img src="./img/BehaviorSubject02.png" width="350"></div>
 
@@ -100,9 +109,8 @@ subjectTwo : 10
 
 ## 3. ReplaySubject
 
-`ReplaySubject` 는 생성시 선택한 특정 크기만큼 일시적으로 캐시하거나 버퍼를 저장해서 최신 요소를 모두 방출합니다.
-
-`ReplaySubject` 는 구독 전에 발생한 이벤트를 버퍼에 넣고, 버퍼 크기를 설정한 만큼 구독 후 이벤트를 전달합니다.  만약 버퍼 크기가 0이라면, `PublishSubject` 와 같은 역할을 하게 됩니다.
+- `ReplaySubject` 는 생성시 선택한 특정 크기만큼 일시적으로 캐시하거나 버퍼를 저장해서 최신 요소를 모두 방출합니다.
+- `ReplaySubject` 는 구독 전에 발생한 이벤트를 버퍼에 넣고, 버퍼 크기를 설정한 만큼 구독 후 이벤트를 전달합니다.  만약 버퍼 크기가 0이라면, `PublishSubject` 와 같은 역할을 하게 됩니다.
 
 <div align="center"><img src="./img/ReplaySubject.png" width="500"></div>
 
@@ -138,8 +146,8 @@ subject.onNext(9)
 
 ## 4. PublishRelay
 
-`PublishRelay` 는 `PublishSubject` 의  `Wrapper` 클래스입니다.
-PublishSubject의 특성처럼 구독 이후의 발생하는 이벤트들만 알 수 있습니다.
+- `PublishRelay` 는 `PublishSubject` 의  `Wrapper` 클래스입니다.
+- PublishSubject의 특성처럼 구독 이후의 발생하는 이벤트들만 알 수 있습니다.
 
 ```swift
 public final class PublishRelay<Element>: ObservableType {
@@ -154,8 +162,8 @@ public final class PublishRelay<Element>: ObservableType {
 
 ## 5. Behavior Relay
 
-BehaviorRelay는 `BehaviorSubject` 의  `Wrapper` 클래스 입니다.
-`.value`를 통해서 현재의 값을 가져올 수 있습니다. 기존의 `Variable`을 대체하기 위한 개념입니다.
+- BehaviorRelay는 `BehaviorSubject` 의  `Wrapper` 클래스 입니다.
+- `.value`를 통해서 현재의 값을 가져올 수 있습니다. 기존의 `Variable`을 대체하기 위한 개념입니다.
 
 ```swift
 public final class BehaviorRelay<Element>: ObservableType {
@@ -183,12 +191,8 @@ public final class BehaviorRelay<Element>: ObservableType {
 - `Relay`는 아예 이벤트 객체를 받는 `on()` 메소드가 구현되어 있지 않기 때문에 이벤트를 바로 넘길 수는 없습니다. 대신 `accept()`라는 메소드를 대신 사용하는데, 이 메소드는 **값**을 인자로 받습니다. `accept()` 메소드는 값을 인자로 받아 `next` 이벤트로 감싸 내부의 Subject에게 흘려보냅니다.
 
 
-
 <br/>
 
 
-
 > 참고 자료 : [Subject](https://jinshine.github.io/2019/01/05/RxSwift/3.Subject란/), [Relay](https://jcsoohwancho.github.io/2019-08-05-RxSwift기초-Relay/)
-
-
 
