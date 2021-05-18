@@ -4,7 +4,7 @@
 
 
 
-<div align="center"><img src="./img/flatmap.png" width="600"></div>
+<div align="center"><img src="./img/flatMap.png" width="600"></div>
 
 <div align="center"><img src="./img/flatmap2.png" width="600"></div>
 
