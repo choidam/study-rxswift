@@ -5,5 +5,6 @@
 </p>
 
 - [Subject / Relay](https://github.com/choidam/study-rxswift/blob/main/study/subject/subject.md)
-- [Observable Traits](https://github.com/choidam/study-rxswift/blob/main/study/obsertable-traits/observable-traits.md)
+- [Observable Traits](https://github.com/choidam/study-rxswift/blob/main/study/observable-traits/observable-traits.md)
 - [Hot Observable / Cold Observable](https://github.com/choidam/study-rxswift/blob/main/study/observable/hot-cold-observable.md)
+- [observeOn / subscribeOn](https://github.com/choidam/study-rxswift/blob/main/study/scheduler/scheduler.md)
